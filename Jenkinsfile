@@ -1,26 +1,19 @@
 pipeline {
-	agent any
-    stages {
-        stage('Checkout SCM') {
-            steps {
-                git url: 'https://github.com/ElizabethLanyl/SSD-lab07-jenkinsphptest.git', branch: 'main', credentialsId: 'jenkins-PAT'
-            }
-        }
+	agent {
+		docker {
+			image 'composer:latest'
+		}
+	}
+	stages {
 		stage('Build') {
 			steps {
-				bat 'composer install'
+				sh 'composer install'
 			}
 		}
 		stage('Test') {
 			steps {
-                bat 'vendor\\bin\\phpunit --log-junit logs\\unitreport.xml -c tests\\phpunit.xml tests'
+                sh './vendor/bin/phpunit tests'
             }
 		}
-	}
-	post {
-	    always{
-	        junit testResults: 'logs/unitreport.xml'
-
-	    }
 	}
 }
